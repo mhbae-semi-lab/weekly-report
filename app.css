@@ -3,7 +3,7 @@
 @font-face { font-family: "Pretendard"; font-weight: 700; font-display: swap; src: url("vendor/fonts/Pretendard-Bold.subset.woff2") format("woff2"); }
 
 :root {
-  --red: #c00000; --red-ink: #a80000; --red-soft: #f6dedd; --red-tint: #fff6f6;
+  --red: #c00000; --red-ink: #a80000; --on-red: #ffffff; --red-soft: #f6dedd; --red-tint: #fff6f6;
   --ink: #1f1f1f; --ink-2: #3d3d3d; --mid: #5e5e5e;
   --line: #d4d4d4; --pale: #f1f1f1; --bg: #f7f7f6; --card: #ffffff; --field: #ffffff;
   --ok: #1f6b2a; --ok-bg: #e6f2e7; --bad-bg: #fbe9e9; --warn-bg: #fff4d6; --warn-ink: #6b4a00;
@@ -15,7 +15,7 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --red: #ff6b6b; --red-ink: #ff8a8a; --red-soft: #4a1f1f; --red-tint: #2a1717;
+    --red: #ff6b6b; --red-ink: #ff8a8a; --on-red: #1b1b1b; --red-soft: #4a1f1f; --red-tint: #2a1717;
     --ink: #ececec; --ink-2: #cfcfcf; --mid: #a8a8a8;
     --line: #3a3a3a; --pale: #232323; --bg: #141414; --card: #1b1b1b; --field: #111;
     --ok: #7fd18b; --ok-bg: #1b2e1e; --bad-bg: #3a1d1d; --warn-bg: #3a3017; --warn-ink: #f0d58a;
@@ -25,7 +25,7 @@
   }
 }
 :root[data-theme="dark"] {
-  --red: #ff6b6b; --red-ink: #ff8a8a; --red-soft: #4a1f1f; --red-tint: #2a1717;
+  --red: #ff6b6b; --red-ink: #ff8a8a; --on-red: #1b1b1b; --red-soft: #4a1f1f; --red-tint: #2a1717;
   --ink: #ececec; --ink-2: #cfcfcf; --mid: #a8a8a8;
   --line: #3a3a3a; --pale: #232323; --bg: #141414; --card: #1b1b1b; --field: #111;
   --ok: #7fd18b; --ok-bg: #1b2e1e; --bad-bg: #3a1d1d; --warn-bg: #3a3017; --warn-ink: #f0d58a;
@@ -55,8 +55,7 @@ html[lang="en"] .ko-only, html[lang="ko"] .en-only { display: none; }
 .bar { position: sticky; top: 0; z-index: 6; background: color-mix(in srgb, var(--card) 94%, transparent); backdrop-filter: blur(6px); border-bottom: 1px solid var(--line); }
 .bar-in { max-width: 1320px; margin: 0 auto; padding: 0 20px; min-height: 56px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .app-name { flex: 1; font-size: 16px; display: flex; align-items: center; gap: 8px; min-width: 0; }
-.app-name > span { display: inline-grid; place-items: center; min-width: 30px; height: 30px; border-radius: 8px; background: var(--red); color: #fff; font-size: 12px; letter-spacing: .5px; }
-:root[data-theme="dark"] .app-name > span { color: #1b1b1b; }
+.app-name > span { display: inline-grid; place-items: center; min-width: 30px; height: 30px; border-radius: 8px; background: var(--red); color: var(--on-red); font-size: 12px; letter-spacing: .5px; }
 .app-name small { font-size: 12.5px; }
 .bar-nav { display: flex; gap: 6px; flex-wrap: wrap; }
 .icon svg { width: 16px; height: 16px; fill: currentColor; }
@@ -70,9 +69,7 @@ html[lang="en"] .ko-only, html[lang="ko"] .en-only { display: none; }
 .guide .btn { justify-self: start; }
 
 /* buttons */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: var(--red); color: #fff; border: 1.5px solid var(--red); border-radius: 8px; padding: 8px 15px; font: 600 14px var(--font); cursor: pointer; text-decoration: none; white-space: nowrap; min-height: 38px; }
-:root[data-theme="dark"] .btn:not(.ghost) { color: #1b1b1b; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn:not(.ghost) { color: #1b1b1b; } }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: var(--red); color: var(--on-red); border: 1.5px solid var(--red); border-radius: 8px; padding: 8px 15px; font: 600 14px var(--font); cursor: pointer; text-decoration: none; white-space: nowrap; min-height: 38px; }
 .btn:hover { filter: brightness(1.08); }
 .btn.ghost { background: var(--card); color: var(--ink); border-color: var(--line); }
 .btn.ghost:hover { border-color: var(--ink-2); filter: none; }
@@ -249,7 +246,7 @@ dialog::backdrop { background: rgba(0,0,0,.45); }
 
 .toast { position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%) translateY(20px); background: var(--ink); color: var(--card); padding: 10px 16px; border-radius: 8px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 30; max-width: calc(100vw - 32px); }
 .toast.show { opacity: 1; transform: translateX(-50%); }
-.toast.bad { background: var(--red-ink); color: #fff; }
+.toast.bad { background: var(--red-ink); color: var(--on-red); }
 
 .foot { max-width: 1320px; margin: 0 auto; padding: 8px 20px 40px; color: var(--mid); font-size: 12.5px; }
 .foot p { margin: 4px 0; }

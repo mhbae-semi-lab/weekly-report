@@ -1,0 +1,126 @@
+commit 1b3a2460123456789abcdef0123456789abcdef
+Author: 홍길동 <hong@example.com>
+Date:   Fri Nov 13 09:00:12 2026 +0900
+
+    README 설치 방법 갱신
+
+docs/README.md
+
+commit 4e7fa030123456789abcdef0123456789abcdef
+Author: 홍길동 <hong@example.com>
+Date:   Fri Nov 13 10:07:12 2026 +0900
+
+    [레시피 파라미터 검사] 범위를 벗어난 값 저장 차단
+
+src/Recipe/ParamValidator.cs
+src/UI/RecipeEditor.xaml
+
+commit 3d6e9f20123456789abcdef0123456789abcdef
+Author: 김철수 <kim@example.com>
+Date:   Thu Nov 12 11:14:12 2026 +0900
+
+    [카세트 매핑] 1호기 슬롯 이중 감지 알람 추가 (FI-245)
+
+src/Handler/Loader/CassetteMap.cs
+src/Vision/Alarm/AlarmCodes.cs
+
+commit 2c5d8e10123456789abcdef0123456789abcdef
+Author: 김철수 <kim@example.com>
+Date:   Wed Nov 11 12:21:12 2026 +0900
+
+    [스테이지 원점 복귀] 원점 복귀 단계별 로그 추가 (FI-238)
+
+src/Motion/Stage/HomeSequence.cs
+
+commit 0a2f1350123456789abcdef0123456789abcdef
+Author: 홍길동 <hong@example.com>
+Date:   Wed Nov 11 13:28:12 2026 +0900
+
+    [PDF 보고서] 그래프 축 단위 표시
+
+src/Report/Pdf/ChartRenderer.cs
+
+commit f4f1e240123456789abcdef0123456789abcdef
+Author: 홍길동 <hong@example.com>
+Date:   Tue Nov 10 14:35:12 2026 +0900
+
+    오토 포커스 탐색 Phase 4 - 모델별 탐색 범위 설정 (FI-231)
+
+src/Vision/Focus/FocusConfig.cs
+src/Vision/Focus/AutoFocus.cs
+src/UI/SettingsView.xaml
+
+commit e3c0d130123456789abcdef0123456789abcdef
+Author: 홍길동 <hong@example.com>
+Date:   Mon Nov 9 15:42:12 2026 +0900
+
+    [PDF 보고서] 주간 요약 페이지
+
+src/Report/Pdf/WeeklyTemplate.cs
+
+commit e7b2a910123456789abcdef0123456789abcdef
+Author: 김철수 <kim@example.com>
+Date:   Fri Nov 6 16:49:12 2026 +0900
+
+    [스테이지 원점 복귀] 원점 복귀 재시도 횟수 설정 추가 (FI-238)
+
+src/Motion/Stage/HomeSequence.cs
+src/UI/SettingsView.xaml
+
+commit d29ec020123456789abcdef0123456789abcdef
+Author: 홍길동 <hong@example.com>
+Date:   Fri Nov 6 17:56:12 2026 +0900
+
+    [PDF 보고서] 인쇄 여백 수정
+
+src/Report/Pdf/PageSetup.cs
+
+commit c16dbf10123456789abcdef0123456789abcdef
+Author: 홍길동 <hong@example.com>
+Date:   Thu Nov 5 09:03:12 2026 +0900
+
+    [영상 뷰어] 커서 위치 픽셀 값 표시
+
+src/UI/ImageViewer/PixelProbe.cs
+
+commit b03cae00123456789abcdef0123456789abcdef
+Author: 김철수 <kim@example.com>
+Date:   Thu Nov 5 10:10:12 2026 +0900
+
+    [로그 정리] 디스크 여유 공간 경고
+
+tools/logrotate.ps1
+tools/diskcheck.ps1
+
+commit af0b9d90123456789abcdef0123456789abcdef
+Author: 홍길동 <hong@example.com>
+Date:   Wed Nov 4 11:17:12 2026 +0900
+
+    [PDF 보고서] 불량 상위 5개 표 추가
+
+src/Report/Pdf/DefectTable.cs
+
+commit 9e7a8c80123456789abcdef0123456789abcdef
+Author: 홍길동 <hong@example.com>
+Date:   Tue Nov 3 12:24:12 2026 +0900
+
+    [영상 뷰어] 마우스 휠 확대 · 드래그 이동
+
+src/UI/ImageViewer/ZoomPanBehavior.cs
+
+commit 8d4f6b70123456789abcdef0123456789abcdef
+Author: 김철수 <kim@example.com>
+Date:   Tue Nov 3 13:31:12 2026 +0900
+
+    [로그 정리] 30일 지난 로그 자동 압축
+
+tools/logrotate.ps1
+
+commit 7c1e4a60123456789abcdef0123456789abcdef
+Author: 홍길동 <hong@example.com>
+Date:   Mon Nov 2 14:38:12 2026 +0900
+
+    [PDF 보고서] 일별 요약 템플릿
+
+src/Report/Pdf/DailyTemplate.cs
+

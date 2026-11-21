@@ -2,7 +2,8 @@
 
 git log 를 주제별로 묶고, 요약에 **입력에 없는 숫자 · 수량 표현 · 상태어 · 효과어**가 들어가면 막은 뒤, 주간 보고 PPTX · Markdown 으로 내보내는 브라우저 전용 웹 앱(PWA)입니다. 서버가 없고, 데이터는 사용자 브라우저에만 저장됩니다.
 
-- 실행: 정적 파일이라 아무 웹 서버로 열면 됩니다 (아래 "설치 · 사용")
+- 바로 쓰기: https://mhbae-semi-lab.github.io/weekly-report/
+- 직접 실행: 정적 파일이라 아무 웹 서버로 열면 됩니다 (아래 "설치 · 사용")
 - 언어: 한국어 · English (화면과 검증 규칙 모두)
 
 ## 관점
@@ -53,7 +54,7 @@ git log 를 주제별로 묶고, 요약에 **입력에 없는 숫자 · 수량 �
 
 ## 설치 · 사용
 
-정적 파일이라 빌드가 없습니다. 저장소 폴더에서 아무 정적 서버로 엽니다.
+설치 없이 https://mhbae-semi-lab.github.io/weekly-report/ 에서 바로 쓸 수 있습니다. 직접 띄우려면, 정적 파일이라 빌드가 없으므로 저장소 폴더에서 아무 정적 서버로 엽니다.
 
 ```
 python -m http.server 8732
@@ -98,7 +99,7 @@ node tests/measure.js
 
 ## English summary
 
-A browser-only PWA that turns `git log` output into a weekly status report (PPTX / Markdown). Commits are grouped by topic, module, equipment ID and field-issue ID; each topic gets a 3-line summary (rule-based, or an LLM in a Shadow column with your own Anthropic key or local Ollama). A fact gate blocks numbers, number words, status words and effect words (including equipment metrics such as yield or uptime) that are not in the commit subjects or memo, and shows why each phrase was blocked. Includes week-over-week comparison, the reproduce → compare → Shadow → switch/rollback workflow, offline support and Korean/English UI. No server; data stays in IndexedDB.
+A browser-only PWA that turns `git log` output into a weekly status report (PPTX / Markdown). Commits are grouped by topic, module, equipment ID and field-issue ID; each topic gets a 3-line summary (rule-based, or an LLM in a Shadow column with your own Anthropic key or local Ollama). A fact gate blocks numbers, number words, status words and effect words (including equipment metrics such as yield or uptime) that are not in the commit subjects or memo, and shows why each phrase was blocked. Includes week-over-week comparison, the reproduce → compare → Shadow → switch/rollback workflow, offline support and Korean/English UI. No server; data stays in IndexedDB. Try it at https://mhbae-semi-lab.github.io/weekly-report/.
 
 ## License
 

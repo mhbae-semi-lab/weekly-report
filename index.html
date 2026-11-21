@@ -3,99 +3,358 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>주간 보고 생성기 · 데모</title>
-  <meta name="description" content="git 커밋과 메모로 주간 보고 PPT 를 만드는 데모 — 합성 데이터">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <title>주간 보고 생성기 · Weekly Report Builder</title>
+  <meta name="description" content="git log 를 주제별로 묶고, 입력에 없는 숫자 · 상태어 · 효과어를 막는 검증을 거쳐 주간 보고 PPTX · Markdown 으로 내보내는 브라우저 전용 앱">
+  <meta name="theme-color" content="#c00000">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="stylesheet" href="app.css">
+  <script>try { const t = localStorage.getItem("wr-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}</script>
 </head>
 <body>
+  <a class="skip-link" href="#main">본문으로 · Skip to content</a>
   <header class="bar">
     <div class="bar-in">
-      <a class="back" href="../../#demo">← 포트폴리오</a>
-      <strong class="app-name"><span>02</span> 주간 보고 생성기</strong>
-      <button class="btn ghost sm" type="button" id="open-settings">설정 · API 키</button>
+      <strong class="app-name"><span aria-hidden="true">WR</span> <b data-i18n="app.name">주간 보고 생성기</b> <small data-i18n="app.tag"></small></strong>
+      <nav class="bar-nav">
+        <button class="btn ghost sm" type="button" id="lang-btn" lang="en">English</button>
+        <button class="btn ghost sm icon" type="button" id="theme-btn" data-i18n-aria="nav.theme" aria-label="화면 밝기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9Z"/></svg></button>
+        <button class="btn ghost sm" type="button" id="open-help" data-i18n="nav.help">도움말</button>
+        <button class="btn ghost sm" type="button" id="open-settings" data-i18n="nav.settings">설정</button>
+      </nav>
     </div>
   </header>
 
-  <main class="page">
-    <section class="intro">
-      <h1>커밋에서 주간 보고 PPT 까지</h1>
-      <p>git 커밋을 주제별로 묶고, 메모(왜 · 상태)를 보태 요약 3줄을 만든 뒤, <b>입력에 없는 숫자 · 상태어 · 효과어</b>를 검사해 양식 PPT 로 내보냅니다.</p>
-      <ol class="steps-nav">
-        <li><span>1</span>커밋 불러오기</li>
-        <li><span>2</span>주제 · 메모 편집</li>
-        <li><span>3</span>검증 · PPT 내보내기</li>
-      </ol>
+  <main class="page" id="main">
+    <section class="guide" id="guide" hidden>
+      <h2 data-i18n="guide.title"></h2>
+      <p data-i18n="guide.body"></p>
+      <button class="btn sm" type="button" data-act="guide-close" data-i18n="guide.close"></button>
     </section>
 
-    <section class="panel source">
+    <section class="panel source" aria-labelledby="h-src">
+      <h2 id="h-src" data-i18n="src.title"></h2>
       <div class="src-tabs" role="tablist">
-        <button type="button" role="tab" data-src="sample" class="on">예시 프로젝트 (합성)</button>
-        <button type="button" role="tab" data-src="paste">내 git log 붙여넣기</button>
+        <button type="button" role="tab" data-src="sample" data-i18n="src.tab.sample"></button>
+        <button type="button" role="tab" data-src="file" data-i18n="src.tab.file"></button>
+        <button type="button" role="tab" data-src="github" data-i18n="src.tab.github"></button>
       </div>
-      <div id="paste-box" class="paste" hidden>
-        <p>저장소에서 아래 명령을 실행하고 결과를 붙여넣으세요. 내용은 이 브라우저 안에서만 처리되고, Claude 로 생성할 때만 해당 주제의 커밋 제목과 메모가 Anthropic API 로 전송됩니다.</p>
-        <pre><code id="git-cmd">git log --no-merges --date=short --name-only --since="5 weeks ago" --author="$(git config user.name)" --format="@@%h|%ad|%s"</code></pre>
-        <textarea id="paste-text" rows="7" spellcheck="false" placeholder="@@a1b2c3d|2026-11-10|[주제] 커밋 제목&#10;src/폴더/파일.cs"></textarea>
+      <div data-pane="sample" role="tabpanel">
         <div class="row">
-          <button class="btn" type="button" id="paste-load">불러오기</button>
-          <span class="hint">영역(태그 · 구역) 규칙은 설정에서 저장소 폴더 구조에 맞게 고칠 수 있습니다.</span>
+          <button class="btn" type="button" data-sample="ko" lang="ko" data-i18n="src.sample.ko"></button>
+          <button class="btn ghost" type="button" data-sample="en" lang="en" data-i18n="src.sample.en"></button>
+        </div>
+        <p class="hint" data-i18n="src.sample.hint"></p>
+      </div>
+      <div data-pane="file" role="tabpanel" hidden>
+        <div class="drop" id="drop">
+          <span data-i18n="src.file.drop"></span>
+          <label class="btn ghost sm"><span data-i18n="src.file.pick"></span><input id="file-input" type="file" accept=".txt,.log,.out,text/plain" class="sr-only"></label>
+        </div>
+        <p class="hint"><span data-i18n="src.file.cmd"></span> <button class="btn ghost xs" type="button" data-act="copy-cmd" data-i18n="src.file.copy"></button></p>
+        <pre class="cmd"><code id="cmd"></code></pre>
+        <p class="hint" data-i18n="src.file.other"></p>
+        <label class="field"><span data-i18n="src.file.paste"></span>
+          <textarea id="paste-text" rows="6" spellcheck="false" placeholder="@@a1b2c3d|2026-11-10|홍길동|[주제] 커밋 제목&#10;src/폴더/파일.cs"></textarea></label>
+        <div class="row">
+          <button class="btn" type="button" data-act="paste-load" data-i18n="src.file.load"></button>
+          <label class="field inline"><span data-i18n="src.file.onelineDate"></span> <input id="oneline-date" type="date" data-ws="onelineDate"></label>
         </div>
       </div>
+      <div data-pane="github" role="tabpanel" hidden>
+        <div class="grid-form">
+          <label class="field"><span data-i18n="src.gh.repo"></span> <input id="gh-repo" placeholder="owner/name" spellcheck="false" autocomplete="off"></label>
+          <label class="field"><span data-i18n="src.gh.since"></span> <input id="gh-since" type="date"></label>
+          <label class="field"><span data-i18n="src.gh.until"></span> <input id="gh-until" type="date"></label>
+          <label class="field"><span data-i18n="src.gh.author"></span> <input id="gh-author" spellcheck="false" autocomplete="off"></label>
+        </div>
+        <label class="check"><input id="gh-files" type="checkbox"> <span data-i18n="src.gh.files"></span></label>
+        <div class="row"><button class="btn" type="button" data-act="gh-load" data-i18n="src.gh.load"></button> <span id="gh-msg" class="hint" role="status"></span></div>
+        <p class="hint" data-i18n="src.gh.hint"></p>
+      </div>
+      <div id="parse-result" class="parse-result" role="status"></div>
+      <div id="filter" class="filter" hidden>
+        <fieldset id="f-authors" class="authors"></fieldset>
+        <label class="field inline"><span data-i18n="filter.from"></span> <input id="f-from" type="date"></label>
+        <label class="field inline"><span data-i18n="filter.to"></span> <input id="f-to" type="date"></label>
+        <small class="hint" data-i18n="filter.hint"></small>
+      </div>
       <div class="weeks-row">
-        <div id="weeks" class="weeks"></div>
+        <div id="weeks" class="weeks" role="group" data-i18n-aria="weeks.label"></div>
         <p id="stats" class="stats"></p>
       </div>
     </section>
 
     <div class="work">
-      <aside class="panel topics">
+      <aside class="panel topics" aria-labelledby="h-topics">
         <div class="panel-head">
-          <h2>주제</h2>
-          <button class="btn ghost sm" type="button" id="gen-all">전체 Claude 로 생성</button>
+          <h2 id="h-topics" data-i18n="topics.title"></h2>
+          <div class="row tight">
+            <button class="btn ghost xs" type="button" data-act="merge" data-i18n="topics.merge"></button>
+            <button class="btn ghost xs" type="button" data-act="regroup" data-i18n="topics.regroup"></button>
+            <button class="btn xs" type="button" id="gen-all" data-i18n="topics.genAll"></button>
+          </div>
         </div>
-        <ul id="topic-list"></ul>
+        <div id="llm-bar" class="llm-bar" hidden role="status"><span id="llm-msg"></span> <button class="btn ghost xs" type="button" data-act="llm-cancel" data-i18n="llm.cancel"></button></div>
+        <ul id="topic-list" class="topic-list"></ul>
       </aside>
-      <section class="panel editor" id="editor"></section>
+      <section class="panel editor" id="editor" aria-live="off"></section>
     </div>
 
-    <section class="panel export">
+    <section class="panel" aria-labelledby="h-cmp">
+      <h2 id="h-cmp" data-i18n="cmp.title"></h2>
+      <div id="compare"></div>
+      <div id="domain" class="domain"></div>
+    </section>
+
+    <section class="panel verify" aria-labelledby="h-vf">
+      <h2 id="h-vf" data-i18n="vf.title"></h2>
+      <p class="hint" data-i18n="vf.sub"></p>
+      <ol class="vf-steps">
+        <li>
+          <h3><span class="step-n">1</span> <span data-i18n="vf.s1"></span></h3>
+          <p data-i18n="vf.s1d"></p>
+          <div class="row tight">
+            <button class="btn ghost sm" type="button" data-sample="ko" data-i18n="vf.openSample"></button>
+            <button class="btn sm" type="button" data-act="replay" data-i18n="vf.replay"></button>
+          </div>
+          <div class="row tight">
+            <label class="sr-only" for="case-label" data-i18n="vf.label"></label>
+            <input id="case-label" data-i18n-ph="vf.label">
+            <button class="btn ghost sm" type="button" data-act="case-save" data-i18n="vf.save"></button>
+          </div>
+          <h4 data-i18n="vf.cases"></h4>
+          <ul id="cases" class="plain"></ul>
+        </li>
+        <li>
+          <h3><span class="step-n">2</span> <span data-i18n="vf.s2"></span></h3>
+          <p data-i18n="vf.s2d"></p>
+          <button class="btn ghost sm" type="button" id="open-dict" data-i18n="vf.openDict"></button>
+          <p id="last-cmp" class="hint"></p>
+        </li>
+        <li>
+          <h3><span class="step-n">3</span> <span data-i18n="vf.s3"></span></h3>
+          <p data-i18n="vf.s3d"></p>
+          <p id="sh-stats" class="stats"></p>
+          <ul id="sh-list" class="plain sh-list"></ul>
+          <button class="btn ghost xs" type="button" data-act="sh-clear" data-i18n="vf.shClear"></button>
+        </li>
+        <li>
+          <h3><span class="step-n">4</span> <span data-i18n="vf.s4"></span></h3>
+          <p id="vf-s4d"></p>
+          <p><span data-i18n="vf.mode"></span>: <b id="mode"></b></p>
+          <p class="meters"><meter id="meter" min="0" max="10" value="0" aria-label="Shadow"></meter> <meter id="rate" min="0" max="1" low="0.79" optimum="1" value="0" aria-label="pass rate"></meter></p>
+          <div class="row tight">
+            <button class="btn sm" type="button" id="switch" data-i18n="vf.switch"></button>
+            <button class="btn ghost sm" type="button" id="rollback" data-i18n="vf.rollback"></button>
+          </div>
+          <p id="switch-why" class="hint"></p>
+          <h4 data-i18n="vf.hist"></h4>
+          <ul id="hist" class="plain hist"></ul>
+        </li>
+      </ol>
+    </section>
+
+    <section class="panel export" aria-labelledby="h-ex">
+      <h2 id="h-ex" class="sr-only" data-i18n="ex.title"></h2>
       <div class="export-in">
-        <label class="field inline">작성자 <input id="author" type="text"></label>
+        <label class="field inline"><span data-i18n="ws.project"></span> <input id="ws-project" data-ws="project"></label>
+        <label class="field inline"><span data-i18n="ws.author"></span> <input id="ws-author" data-ws="author"></label>
         <p id="export-stats" class="stats"></p>
-        <button class="btn" type="button" id="export">PPT 내보내기</button>
+        <div class="row tight">
+          <button class="btn" type="button" id="ex-pptx" data-i18n="ex.pptx"></button>
+          <button class="btn ghost" type="button" id="ex-tpl" data-i18n="ex.tpl" hidden></button>
+          <button class="btn ghost" type="button" id="ex-md" data-i18n="ex.md"></button>
+          <button class="btn ghost" type="button" id="ex-copy" data-i18n="ex.copy"></button>
+        </div>
       </div>
       <p id="export-msg" class="msg" role="status"></p>
     </section>
   </main>
 
-  <footer class="foot">합성 데이터: 가상 프로젝트 SpotCheck (실존하지 않음). 사내용 Python CLI 를 공개용으로 옮긴 데모입니다.</footer>
+  <footer class="foot">
+    <p data-i18n="foot.note"></p>
+    <p><a href="privacy.html" data-i18n="foot.privacy"></a> · <a href="https://github.com/mhbae-semi-lab/weekly-report" data-i18n="foot.src"></a> · v1.0.0 · MIT</p>
+  </footer>
 
-  <dialog id="settings">
-    <form method="dialog" class="dlg">
-      <h2>설정</h2>
-      <label class="field">Anthropic API 키
-        <input id="api-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-...">
-        <small>이 페이지의 메모리에만 두고 저장하지 않습니다 (새로고침하면 사라짐). 요청은 브라우저에서 api.anthropic.com 으로 바로 갑니다.</small>
-      </label>
-      <label class="field">모델
-        <select id="model"></select>
-      </label>
-      <label class="field">영역 규칙 (JSON)
-        <textarea id="rules" rows="9" spellcheck="false"></textarea>
-        <small>파일 경로가 match 로 시작하면 그 tag · section 으로 묶습니다. 바꾸면 현재 주차를 다시 묶고 편집 내용은 초기화됩니다.</small>
-      </label>
-      <p id="settings-err" class="msg err"></p>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- 설정 -->
+  <dialog id="settings" aria-labelledby="set-h">
+    <div class="dlg">
+      <h2 id="set-h" data-i18n="set.title"></h2>
+      <div class="src-tabs" role="tablist">
+        <button type="button" role="tab" data-stab="llm" data-i18n="set.tab.llm"></button>
+        <button type="button" role="tab" data-stab="dict" data-i18n="set.tab.dict"></button>
+        <button type="button" role="tab" data-stab="style" data-i18n="set.tab.style"></button>
+        <button type="button" role="tab" data-stab="data" data-i18n="set.tab.data"></button>
+      </div>
+      <div data-spane="llm" role="tabpanel">
+        <label class="field"><span data-i18n="set.provider"></span>
+          <select id="s-provider"><option value="anthropic" data-i18n="set.p.anthropic"></option><option value="ollama" data-i18n="set.p.ollama"></option></select></label>
+        <label class="field"><span data-i18n="set.key"></span>
+          <input id="s-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-...">
+          <small data-i18n="set.keyHint"></small></label>
+        <label class="field"><span data-i18n="set.model"></span> <select id="s-model"></select></label>
+        <div class="grid-form">
+          <label class="field"><span data-i18n="set.ollamaUrl"></span> <input id="s-ollamaUrl" spellcheck="false"></label>
+          <label class="field"><span data-i18n="set.ollamaModel"></span> <input id="s-ollamaModel" spellcheck="false"></label>
+        </div>
+        <small class="hint" data-i18n="set.ollamaHint"></small>
+        <label class="field"><span data-i18n="set.mask"></span> <input id="s-mask" spellcheck="false"><small data-i18n="set.maskHint"></small></label>
+        <div class="row">
+          <label class="check"><input id="s-preview" type="checkbox"> <span data-i18n="set.preview"></span></label>
+          <label class="field inline"><span data-i18n="set.timeout"></span> <input id="s-timeout" type="number" min="5" max="600" class="num"></label>
+        </div>
+      </div>
+      <div data-spane="dict" role="tabpanel" hidden>
+        <div class="grid-form">
+          <label class="field"><span data-i18n="set.reportLang"></span> <select id="s-reportLang"><option value="ko">한국어</option><option value="en">English</option></select></label>
+          <label class="field"><span data-i18n="set.groupBy"></span> <select id="s-groupBy"><option value="section" data-i18n="set.g.section"></option><option value="equipment" data-i18n="set.g.equipment"></option></select></label>
+        </div>
+        <label class="field"><span data-i18n="set.equipment"></span> <input id="s-equipment" spellcheck="false" class="mono"></label>
+        <label class="field"><span data-i18n="set.issue"></span> <input id="s-issue" spellcheck="false" class="mono"></label>
+        <label class="field"><span data-i18n="set.rules"></span> <textarea id="s-rules" rows="10" spellcheck="false" class="mono"></textarea><small data-i18n="set.rulesHint"></small></label>
+        <button class="btn ghost xs" type="button" data-act="dict-reset" data-i18n="set.resetDict"></button>
+      </div>
+      <div data-spane="style" role="tabpanel" hidden>
+        <div class="grid-form">
+          <label class="field"><span data-i18n="set.accent"></span> <input id="s-accent" type="color"></label>
+          <label class="field"><span data-i18n="set.font"></span> <input id="s-font"></label>
+          <label class="field"><span data-i18n="set.cover"></span> <input id="s-cover"></label>
+          <label class="field"><span data-i18n="set.footer"></span> <input id="s-footer"></label>
+        </div>
+        <div class="row">
+          <label class="check"><input id="s-sections" type="checkbox"> <span data-i18n="set.sections"></span></label>
+          <label class="check"><input id="s-cards" type="checkbox"> <span data-i18n="set.cards"></span></label>
+          <label class="check"><input id="s-compare" type="checkbox"> <span data-i18n="set.compare"></span></label>
+          <label class="check"><input id="s-domain" type="checkbox"> <span data-i18n="set.domain"></span></label>
+        </div>
+        <h3 data-i18n="set.tpl"></h3>
+        <p class="hint" data-i18n="set.tplHint"></p>
+        <p id="tpl-info" class="stats"></p>
+        <div class="row tight">
+          <label class="btn ghost sm"><span data-i18n="set.tplUp"></span><input id="tpl-input" type="file" accept=".pptx" class="sr-only"></label>
+          <button class="btn ghost sm" type="button" id="tpl-del" data-act="tpl-del" data-i18n="set.tplDel"></button>
+          <button class="btn ghost sm" type="button" data-act="tpl-sample" data-i18n="set.tplSample"></button>
+        </div>
+      </div>
+      <div data-spane="data" role="tabpanel" hidden>
+        <p id="storage-info" class="hint"></p>
+        <div class="row tight">
+          <button class="btn ghost sm" type="button" data-act="backup" data-i18n="set.backup"></button>
+          <label class="btn ghost sm"><span data-i18n="set.restore"></span><input id="restore-input" type="file" accept=".json,application/json" class="sr-only"></label>
+          <button class="btn danger sm" type="button" data-act="reset" data-i18n="set.reset"></button>
+        </div>
+        <h3 data-i18n="set.errors"></h3>
+        <ul id="err-list" class="plain errlog"></ul>
+        <div class="row tight">
+          <button class="btn ghost xs" type="button" data-act="err-dl" data-i18n="set.errDl"></button>
+          <button class="btn ghost xs" type="button" data-act="err-clear" data-i18n="set.errClear"></button>
+        </div>
+      </div>
+      <p id="settings-err" class="msg err" role="alert"></p>
       <div class="row end">
-        <button class="btn ghost" value="cancel" type="submit">닫기</button>
-        <button class="btn" id="settings-save" value="save" type="submit">저장</button>
+        <button class="btn ghost" type="button" onclick="this.closest('dialog').close()" data-i18n="set.close"></button>
+        <button class="btn" type="button" id="settings-save" data-i18n="set.save"></button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- 바꾸기 전 비교 -->
+  <dialog id="cmp-dlg" class="wide" aria-labelledby="cmp-h">
+    <div class="dlg">
+      <h2 id="cmp-h" data-i18n="cmpdlg.title"></h2>
+      <p class="hint" data-i18n="cmpdlg.sub"></p>
+      <p id="cmp-sum" class="stats"></p>
+      <div id="cmp-body" class="scroll-x"></div>
+      <div class="row end">
+        <button class="btn ghost" type="button" onclick="this.closest('dialog').close()" data-i18n="set.cancel"></button>
+        <button class="btn" type="button" data-act="cmp-apply" data-i18n="cmpdlg.apply"></button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- LLM 에 보낼 내용 -->
+  <dialog id="send" class="wide" aria-labelledby="send-h">
+    <form method="dialog" class="dlg">
+      <h2 id="send-h" data-i18n="send.title"></h2>
+      <p id="send-sub" class="hint"></p>
+      <pre id="send-text" class="log light"></pre>
+      <label class="check"><input id="send-dont" type="checkbox"> <span data-i18n="send.dont"></span></label>
+      <div class="row end">
+        <button class="btn ghost" value="cancel" data-i18n="set.cancel"></button>
+        <button class="btn" value="ok" data-i18n="send.ok"></button>
       </div>
     </form>
   </dialog>
 
-  <script src="core.js"></script>
-  <script src="sample.js"></script>
-  <script src="deck.js"></script>
-  <script src="app.js"></script>
+  <!-- 재현 세트 보기 -->
+  <dialog id="case" class="wide" aria-labelledby="case-h">
+    <form method="dialog" class="dlg">
+      <h2 id="case-h"></h2>
+      <div id="case-body"></div>
+      <div class="row end"><button class="btn" value="close" data-i18n="set.close"></button></div>
+    </form>
+  </dialog>
+
+  <!-- 도움말 -->
+  <dialog id="help" class="wide" aria-labelledby="help-h">
+    <form method="dialog" class="dlg help">
+      <h2 id="help-h" data-i18n="help.title"></h2>
+      <div class="ko-only" lang="ko">
+        <h3>시작하기</h3>
+        <ol>
+          <li>저장소 폴더에서 아래 명령을 실행하고 결과를 파일로 저장합니다. <code>git log --no-merges --date=short --name-only --since="5 weeks ago" --format="@@%h|%ad|%an|%s" &gt; log.txt</code></li>
+          <li>log.txt 를 화면에 끌어다 놓습니다. 일반 <code>git log</code>, <code>--stat</code>, <code>--name-status</code>, <code>--numstat</code>, <code>--oneline</code> 출력도 읽습니다.</li>
+          <li>주차를 고르고, 주제마다 메모의 <b>왜</b> 와 <b>상태</b>("완료: …", "예정: …")를 채웁니다. 지난주에 이어진 주제는 지난주 '왜'를 이어받습니다.</li>
+          <li>요약이 검증을 통과하면 PPTX · Markdown 으로 내보냅니다.</li>
+        </ol>
+        <h3>숫자 사실 검증은 무엇을 막나요?</h3>
+        <p>요약(제목 · 3줄)에 나온 숫자 · 날짜 · 소수, "세 배" "절반" 같은 글자 수량, 완료 · 검증 · 배포 같은 상태어, 단축 · 향상 · 수율 · 가동률 같은 효과어가 <b>커밋 제목 · 메모에 없으면</b> 막습니다. 막힌 표현과 이유는 요약 아래 표에 나옵니다. 숫자가 맞다면 메모에 적어 근거를 남기세요.</p>
+        <h3>영역 사전</h3>
+        <p>설정 › 영역 사전에서 모듈 규칙(파일 경로 접두어 · 제목 단어), 설비 번호 패턴(예: <code>3호기</code>, <code>EQ-03</code>), 현장 이슈 번호 패턴(예: <code>FI-238</code>, <code>#123</code>)을 정합니다. 같은 이슈 번호를 가진 커밋은 제목이 달라도 한 주제로 묶입니다. 바꾸기 전에 같은 데이터로 전 / 후를 비교해 보여줍니다.</p>
+        <h3>LLM 은 꼭 필요한가요?</h3>
+        <p>아니요. 키가 없어도 규칙 기반 요약 · 검증 · 내보내기가 모두 됩니다. LLM 요약은 Shadow 칸에만 나오고, 검증을 통과한 것만 채택할 수 있습니다. Shadow 기록이 10건 이상이고 통과율이 80% 이상이면 "LLM 채택으로 전환"이 켜지며, 언제든 되돌릴 수 있습니다.</p>
+        <h3>내 PPTX 양식</h3>
+        <p>설정 › PPTX 양식에서 "자리표시자 예시 양식"을 받아 내 양식에 같은 자리표시자를 넣고 올리세요. <code>{{title}}</code> 이 있는 첫 슬라이드가 내지로 쓰이고 주제 수만큼 복제됩니다.</p>
+        <h3>문제 해결</h3>
+        <ul>
+          <li><b>"상대 날짜" 오류</b>: 명령에 <code>--date=short</code> 를 붙이세요.</li>
+          <li><b>한글이 깨짐</b>: UTF-8 로 저장하세요. EUC-KR 파일은 자동으로 다시 읽어 봅니다.</li>
+          <li><b>Ollama 연결 실패</b>: Ollama 를 실행하고, 이 사이트 주소를 <code>OLLAMA_ORIGINS</code> 에 넣어 다시 시작하세요.</li>
+          <li><b>데이터 옮기기</b>: 설정 › 데이터에서 백업(JSON)을 내보내 다른 브라우저에서 가져옵니다.</li>
+        </ul>
+      </div>
+      <div class="en-only" lang="en">
+        <h3>Getting started</h3>
+        <ol>
+          <li>In your repository run the command below and save the output. <code>git log --no-merges --date=short --name-only --since="5 weeks ago" --format="@@%h|%ad|%an|%s" &gt; log.txt</code></li>
+          <li>Drop log.txt onto the page. Plain <code>git log</code>, <code>--stat</code>, <code>--name-status</code>, <code>--numstat</code> and <code>--oneline</code> output also work.</li>
+          <li>Pick a week and fill each topic's <b>why</b> and <b>status</b> ("Done: …", "Next: …"). Topics continued from last week take over last week's 'why'.</li>
+          <li>When the summaries pass the check, export PPTX or Markdown.</li>
+        </ol>
+        <h3>What does the fact gate block?</h3>
+        <p>Numbers, dates and decimals, quantities written in words ("three times", "half"), status words (done, verified, deployed) and effect words (faster, yield, uptime, throughput) in the title or lines are blocked <b>when they are not in the commit subjects or memo</b>. The blocked phrases and the reason appear under the summary. If a number is real, write it in the memo as evidence.</p>
+        <h3>Domain dictionary</h3>
+        <p>Settings › Dictionary sets module rules (path prefixes · subject words), the equipment ID pattern (e.g. <code>EQ-03</code>, <code>Tool 2</code>) and the field issue pattern (e.g. <code>FI-238</code>, <code>#123</code>). Commits that share an issue ID form one topic even with different subjects. Before a change is applied you see before / after on the same data.</p>
+        <h3>Do I need an LLM?</h3>
+        <p>No. Without a key, rule-based summaries, checks and export all work. LLM summaries appear only in the Shadow column and can be adopted only when they pass. With 10+ Shadow runs and a pass rate of 80%+ the "Switch to LLM adoption" button turns on, and you can always roll back.</p>
+        <h3>My PPTX template</h3>
+        <p>In Settings › PPTX style, download the placeholder sample, put the same placeholders in your template and upload it. The first slide with <code>{{title}}</code> is the content slide and is copied once per topic.</p>
+        <h3>Troubleshooting</h3>
+        <ul>
+          <li><b>"Relative date" error</b>: add <code>--date=short</code> to the command.</li>
+          <li><b>Broken Korean text</b>: save as UTF-8. EUC-KR files are re-read automatically.</li>
+          <li><b>Ollama unreachable</b>: start Ollama with this site's origin in <code>OLLAMA_ORIGINS</code>.</li>
+          <li><b>Moving data</b>: export a backup (JSON) in Settings › Data and import it in the other browser.</li>
+        </ul>
+      </div>
+      <div class="row end"><button class="btn" value="close" data-i18n="set.close"></button></div>
+    </form>
+  </dialog>
+
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>

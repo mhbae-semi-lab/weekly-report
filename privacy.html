@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>개인정보 · 데이터 안내 — 주간 보고 생성기</title>
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="app.css">
+  <style>.doc { max-width: 760px; margin: 0 auto; padding: 24px 20px 48px; } .doc h2 { margin: 28px 0 8px; } .doc li { margin: 4px 0; }</style>
+</head>
+<body>
+  <main class="doc">
+    <p><a href="./">← 주간 보고 생성기 · Weekly Report Builder</a></p>
+    <section lang="ko">
+      <h1>개인정보 · 데이터 안내</h1>
+      <p>이 앱은 서버가 없는 정적 웹 앱입니다. 운영자는 사용자의 데이터를 받거나 저장하지 않습니다.</p>
+      <h2>어디에 저장되나요</h2>
+      <ul>
+        <li>불러온 커밋, 메모, 요약, 설정, Shadow 기록, 재현 세트, 올린 PPTX 양식은 <b>이 브라우저의 IndexedDB</b> 에만 저장됩니다.</li>
+        <li>오류 기록도 이 브라우저에만 남고 밖으로 보내지 않습니다 (설정 › 데이터 · 오류에서 보고 지울 수 있음).</li>
+        <li>화면 밝기 선택만 localStorage 에 저장합니다.</li>
+        <li>Anthropic API 키는 <b>페이지 메모리에만</b> 두고 저장하지 않습니다. 새로고침하면 사라집니다.</li>
+        <li>설정 › 데이터에서 백업(JSON)을 내보내거나, 모든 데이터를 지울 수 있습니다.</li>
+      </ul>
+      <h2>밖으로 나가는 경우 (사용자가 버튼을 누를 때만)</h2>
+      <ul>
+        <li><b>LLM 생성</b>: 고른 주제의 주제 이름 · 메모 · 커밋 제목이 사용자 본인 키로 <code>api.anthropic.com</code> 에 직접 전송되거나, 로컬 Ollama 주소로 전송됩니다. 보내기 전에 실제 요청을 미리 보여주고, 메일 · IP · URL · Windows/UNC 경로와 사용자가 지정한 단어는 [M1] 같은 자리표시자로 가립니다. 파일 경로 목록은 보내지 않습니다.</li>
+        <li><b>GitHub 가져오기</b>: 입력한 저장소 이름 · 기간 · 작성자가 <code>api.github.com</code> 으로 전송됩니다.</li>
+      </ul>
+      <p>그 밖의 분석 도구 · 광고 · 외부 오류 수집은 없습니다. 글꼴과 라이브러리도 이 사이트 안의 파일을 씁니다.</p>
+    </section>
+    <hr>
+    <section lang="en">
+      <h1>Privacy · data</h1>
+      <p>This is a static web app without a server. The operator never receives or stores your data.</p>
+      <h2>Where data is stored</h2>
+      <ul>
+        <li>Imported commits, memos, summaries, settings, Shadow records, reproduction sets and an uploaded PPTX template are stored <b>only in this browser's IndexedDB</b>.</li>
+        <li>The error log also stays in this browser and is never sent anywhere (view or clear it in Settings › Data · errors).</li>
+        <li>Only the theme choice is kept in localStorage.</li>
+        <li>Your Anthropic API key is kept <b>only in page memory</b>, never saved, and gone on reload.</li>
+        <li>In Settings › Data you can export a JSON backup or erase everything.</li>
+      </ul>
+      <h2>When data leaves the browser (only when you press the button)</h2>
+      <ul>
+        <li><b>LLM generation</b>: the topic name, memo and commit subjects of the chosen topics are sent with your own key straight to <code>api.anthropic.com</code>, or to your local Ollama URL. The actual request is shown first; e-mail, IP, URL, Windows/UNC paths and your listed words are masked as [M1]-style placeholders. File path lists are not sent.</li>
+        <li><b>GitHub fetch</b>: the repository name, dates and author you typed are sent to <code>api.github.com</code>.</li>
+      </ul>
+      <p>There are no analytics, ads or external error reporting. Fonts and libraries are served from this site.</p>
+    </section>
+  </main>
+</body>
+</html>

@@ -139,7 +139,14 @@ export function parseGitLog(text, opt = {}) {
 }
 
 // ---------------------------------------------------------------- 주차 · 필터
+const weekCache = new Map(); // 같은 날짜를 화면을 그릴 때마다 다시 계산하지 않게 (커밋 2만 개 기준 수십 ms)
 export function isoWeek(dateStr) {
+  let w = weekCache.get(dateStr);
+  if (!w) weekCache.set(dateStr, (w = isoWeekOf(dateStr)));
+  return w;
+}
+
+function isoWeekOf(dateStr) {
   const [y, m, d] = dateStr.split("-").map(Number);
   const dt = new Date(Date.UTC(y, m - 1, d));
   const day = dt.getUTCDay() || 7;

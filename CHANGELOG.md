@@ -5,6 +5,7 @@
 - 로컬 Ollama 기본 모델을 `qwen3:8b` → `bonsai-2.5:27b` (Ternary Bonsai 2.5 27B) 로 바꿈. 만드는 법은 README "로컬 Ollama"
 - 기본 시간 제한 60초 → 600초 (느린 모델 기준: 응답 200토큰에 2~3.5분)
 - Ollama 요청에 `think: false` 를 넣어 thinking 을 끔
+- Ollama 응답을 `stream: true` 로 받아 모음. 전에는 답을 다 만든 뒤에야 응답 헤더가 와서, 5분 넘게 걸리면 시간 제한과 상관없이 연결이 끊겼다
 - 이미 저장된 설정(모델 · 시간 제한)은 그대로 두므로, 바꾸려면 설정 › LLM 에서 고친다
 - service worker 캐시 버전을 올려 기존 오프라인 캐시를 새로 받음
 

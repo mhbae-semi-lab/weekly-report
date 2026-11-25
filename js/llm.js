@@ -30,26 +30,47 @@ function mapSdkError(e) {
   return new LlmError("net", e.message || String(e));
 }
 
+// stream:true 로 받아 조각을 모은다. stream:false 는 답을 다 만든 뒤에야 응답 헤더가 와서,
+// 수 분 걸리는 모델(bonsai-2.5:27b)은 시간 제한 설정과 상관없이 응답 헤더 대기 제한(Node fetch 300초 등)에 먼저 끊긴다
+async function readOllamaStream(res) {
+  const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
+  let buf = "", content = "", model = "";
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (value) buf += value;
+    const lines = buf.split("\n");
+    buf = done ? "" : lines.pop();
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      const j = JSON.parse(line);
+      if (j.error) throw new LlmError("ollama", j.error, true);
+      content += j.message?.content || "";
+      model = j.model || model;
+    }
+    if (done) return { content, model };
+  }
+}
+
 // cfg: { provider, apiKey, model, ollamaUrl, ollamaModel, timeout(초) }, signal: AbortSignal
 async function callOnce(cfg, sys, user, signal) {
   if (cfg.provider === "ollama") {
-    let res;
     const tm = AbortSignal.timeout((cfg.timeout || 600) * 1000);
     try {
-      res = await fetch(String(cfg.ollamaUrl || "http://localhost:11434").replace(/\/$/, "") + "/api/chat", {
+      const res = await fetch(String(cfg.ollamaUrl || "http://localhost:11434").replace(/\/$/, "") + "/api/chat", {
         method: "POST", headers: { "content-type": "application/json" },
         signal: AbortSignal.any([signal, tm]),
-        body: JSON.stringify({ model: cfg.ollamaModel || "bonsai-2.5:27b", stream: false, think: false, format: OUTPUT_SCHEMA, options: { temperature: 0 },
+        body: JSON.stringify({ model: cfg.ollamaModel || "bonsai-2.5:27b", stream: true, think: false, format: OUTPUT_SCHEMA, options: { temperature: 0 },
           messages: [{ role: "system", content: sys }, { role: "user", content: user }] }),
       });
+      if (!res.ok) throw new LlmError("ollama", res.status + " " + (await res.text()).slice(0, 200), true);
+      const j = await readOllamaStream(res);
+      return { text: j.content, model: "ollama:" + (j.model || cfg.ollamaModel) };
     } catch (e) {
+      if (e instanceof LlmError) throw e;
       if (signal.aborted) throw new LlmError("abort", "", true);
       if (tm.aborted) throw new LlmError("timeout");
       throw new LlmError("ollama", e.message, true);
     }
-    if (!res.ok) throw new LlmError("ollama", res.status + " " + (await res.text()).slice(0, 200), true);
-    const j = await res.json();
-    return { text: j.message?.content || "", model: "ollama:" + (j.model || cfg.ollamaModel) };
   }
   const { default: Anthropic } = await loadSdk();
   const m = MODELS.find((x) => x.id === cfg.model) || MODELS[0];

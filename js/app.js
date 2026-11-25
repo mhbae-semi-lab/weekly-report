@@ -29,7 +29,7 @@ const DB = (() => {
 const freshWs = (lang) => ({
   v: 1, lang, reportLang: lang, source: "", commits: [], parse: null, filter: { authors: [], from: "", to: "" },
   project: "", author: "", cfg: clone(DEFAULT_CONFIG[lang]), weeks: {}, week: null, shadow: [], decision: "rule", history: [], cases: [],
-  style: { ...DEFAULT_STYLE }, llm: { provider: "anthropic", model: MODELS[0].id, ollamaUrl: "http://localhost:11434", ollamaModel: "qwen3:8b", maskWords: [], preview: true, timeout: 60 },
+  style: { ...DEFAULT_STYLE }, llm: { provider: "anthropic", model: MODELS[0].id, ollamaUrl: "http://localhost:11434", ollamaModel: "bonsai-2.5:27b", maskWords: [], preview: true, timeout: 600 },
   onelineDate: "", guideDone: false, groupBy: "section", savedAt: null,
 });
 
@@ -838,7 +838,7 @@ function saveSettings() {
   S.apiKey = $("#s-key").value.trim();
   Object.assign(S.ws.llm, {
     provider: $("#s-provider").value, model: $("#s-model").value, ollamaUrl: $("#s-ollamaUrl").value.trim(), ollamaModel: $("#s-ollamaModel").value.trim(),
-    maskWords: $("#s-mask").value.split(",").map((s) => s.trim()).filter(Boolean), preview: $("#s-preview").checked, timeout: Math.max(5, +$("#s-timeout").value || 60),
+    maskWords: $("#s-mask").value.split(",").map((s) => s.trim()).filter(Boolean), preview: $("#s-preview").checked, timeout: Math.max(5, +$("#s-timeout").value || 600),
   });
   Object.assign(S.ws.style, {
     accent: $("#s-accent").value.replace("#", "").toUpperCase(), font: $("#s-font").value.trim() || DEFAULT_STYLE.font, cover: $("#s-cover").value.trim(), footer: $("#s-footer").value.trim(),

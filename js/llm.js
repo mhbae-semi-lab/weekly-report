@@ -34,12 +34,12 @@ function mapSdkError(e) {
 async function callOnce(cfg, sys, user, signal) {
   if (cfg.provider === "ollama") {
     let res;
-    const tm = AbortSignal.timeout((cfg.timeout || 60) * 1000);
+    const tm = AbortSignal.timeout((cfg.timeout || 600) * 1000);
     try {
       res = await fetch(String(cfg.ollamaUrl || "http://localhost:11434").replace(/\/$/, "") + "/api/chat", {
         method: "POST", headers: { "content-type": "application/json" },
         signal: AbortSignal.any([signal, tm]),
-        body: JSON.stringify({ model: cfg.ollamaModel || "qwen3:8b", stream: false, format: OUTPUT_SCHEMA, options: { temperature: 0 },
+        body: JSON.stringify({ model: cfg.ollamaModel || "bonsai-2.5:27b", stream: false, think: false, format: OUTPUT_SCHEMA, options: { temperature: 0 },
           messages: [{ role: "system", content: sys }, { role: "user", content: user }] }),
       });
     } catch (e) {
@@ -59,7 +59,7 @@ async function callOnce(cfg, sys, user, signal) {
     messages: [{ role: "user", content: user }],
     output_config: { effort: "low", format: { type: "json_schema", schema: OUTPUT_SCHEMA } },
   };
-  const opt = { signal, timeout: (cfg.timeout || 60) * 1000 };
+  const opt = { signal, timeout: (cfg.timeout || 600) * 1000 };
   let res;
   try {
     // Opus 5.5 · Sonnet 5.5: 안전 분류기가 거절하면 서버가 다른 모델로 이어서 처리 (Haiku 5.5 는 미지원)

@@ -1,6 +1,6 @@
 {
   "name": "weekly-report",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "git log 에서 주간 보고 PPTX 까지 — 브라우저 전용 PWA",
   "type": "module",

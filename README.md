@@ -71,6 +71,25 @@ python -m http.server 8732
 3. 주제마다 메모의 왜 · 상태를 채우고, 검증을 통과하면 내보냅니다.
 4. (선택) 설정에서 본인 Anthropic API 키나 로컬 Ollama 를 넣으면 LLM 요약이 Shadow 칸에 나옵니다. 키는 메모리에만 둡니다.
 
+### 로컬 Ollama
+
+기본 모델은 `bonsai-2.5:27b` (PrismML Ternary Bonsai 2.5 27B, Apache 2.0) 입니다. `ollama pull` 로는 받을 수 없습니다. 공식 `bonsai-2:27b` 는 이전 세대이고, `hf.co/prism-ml/Ternary-Bonsai-2.5-27B-GGUF:Q2_0` 는 일반 Ollama 가 읽지 못하는 PQ2_0 파일을 받습니다. 그래서 GGUF 를 직접 받아 만듭니다 (Ollama 0.40.6 이상).
+
+1. [Ternary-Bonsai-2.5-27B-Q2_0.gguf](https://huggingface.co/prism-ml/Ternary-Bonsai-2.5-27B-GGUF/resolve/main/Ternary-Bonsai-2.5-27B-Q2_0.gguf) (7.67GB) 를 받아 빈 폴더에 둡니다.
+2. 같은 폴더에 `Modelfile` 을 만듭니다.
+   ```
+   FROM ./Ternary-Bonsai-2.5-27B-Q2_0.gguf
+   RENDERER qwen3.8
+   PARSER qwen3.5
+   PARAMETER temperature 1
+   PARAMETER top_k 20
+   PARAMETER top_p 0.95
+   PARAMETER min_p 0.05
+   ```
+3. 그 폴더에서 `ollama create bonsai-2.5:27b -f Modelfile`
+
+느린 모델입니다. RTX 3050 4GB · RAM 32GB PC 실측: 생성 약 1.8 토큰/초, 입력 처리 약 64 토큰/초, 처음 불러오기 55~130초, 응답 200토큰에 2~3.5분. 그래서 기본 시간 제한을 600초로 두었습니다. 앱은 Ollama 요청에 `think: false` 를 넣어 thinking 을 끕니다. 더 빠른 작은 모델(예: `qwen3:8b`)을 쓰려면 그 모델을 받은 뒤 설정 › LLM 의 Ollama 모델 이름만 바꾸면 됩니다.
+
 테스트:
 
 ```
@@ -100,6 +119,8 @@ node tests/measure.js
 ## English summary
 
 A browser-only PWA that turns `git log` output into a weekly status report (PPTX / Markdown). Commits are grouped by topic, module, equipment ID and field-issue ID; each topic gets a 3-line summary (rule-based, or an LLM in a Shadow column with your own Anthropic key or local Ollama). A fact gate blocks numbers, number words, status words and effect words (including equipment metrics such as yield or uptime) that are not in the commit subjects or memo, and shows why each phrase was blocked. Includes week-over-week comparison, the reproduce → compare → Shadow → switch/rollback workflow, offline support and Korean/English UI. No server; data stays in IndexedDB. Try it at https://mhbae-semi-lab.github.io/weekly-report/.
+
+Local Ollama: the default model is `bonsai-2.5:27b` (PrismML Ternary Bonsai 2.5 27B). It cannot be fetched with `ollama pull` (the official `bonsai-2:27b` is the previous generation, and the `hf.co/...:Q2_0` tag downloads a PQ2_0 file that stock Ollama cannot load), so download `Ternary-Bonsai-2.5-27B-Q2_0.gguf` and run `ollama create bonsai-2.5:27b -f Modelfile` with the Modelfile shown above (Ollama 0.40.6+). It is slow: about 1.8 tokens/s on an RTX 3050 4GB / 32GB RAM PC and 2–3.5 min for a 200-token answer, so the default timeout is 600 s. Requests send `think: false`. For a smaller, faster model such as `qwen3:8b`, just change the Ollama model name in Settings › LLM.
 
 ## License
 

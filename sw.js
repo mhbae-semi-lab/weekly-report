@@ -1,6 +1,6 @@
 // 오프라인용 service worker: 설치 때 앱 파일을 모두 받아 두고, 평소에는 네트워크 우선(받은 파일로 캐시 갱신),
 // 네트워크가 안 되면 캐시로 응답한다. 다른 주소(LLM · GitHub) 요청은 가로채지 않는다.
-const VERSION = "wr-1.0.0";
+const VERSION = "wr-1.0.1";
 const FILES = [
   "./", "index.html", "privacy.html", "app.css", "manifest.webmanifest",
   "js/app.js", "js/core.js", "js/deck.js", "js/template.js", "js/sample.js", "js/i18n.js", "js/llm.js",

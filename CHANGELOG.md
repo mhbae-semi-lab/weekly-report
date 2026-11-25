@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.1 — 2026-11-25
+
+- 로컬 Ollama 기본 모델을 `qwen3:8b` → `bonsai-2.5:27b` (Ternary Bonsai 2.5 27B) 로 바꿈. 만드는 법은 README "로컬 Ollama"
+- 기본 시간 제한 60초 → 600초 (느린 모델 기준: 응답 200토큰에 2~3.5분)
+- Ollama 요청에 `think: false` 를 넣어 thinking 을 끔
+- 이미 저장된 설정(모델 · 시간 제한)은 그대로 두므로, 바꾸려면 설정 › LLM 에서 고친다
+- service worker 캐시 버전을 올려 기존 오프라인 캐시를 새로 받음
+
 ## 1.0.0 — 2026-11-21
 
 포트폴리오 데모(`site/apps/02-weekly-report`)를 공개용 PWA 로 새로 만들었다.
